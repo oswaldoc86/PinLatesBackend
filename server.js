@@ -1,32 +1,24 @@
-require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
+const Grupo = require('./models/Grupo'); // Importar el modelo
 
-console.log("🔍 MONGO_URI:", process.env.MONGO_URI); // Verificar si la variable está bien cargada
-
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => {
-  console.log('✅ Conectado a MongoDB');
-}).catch(err => {
-  console.error('❌ Error de conexión a MongoDB:', err);
-});
-
+require("dotenv").config();
 const app = express();
 app.use(express.json());
 
-// Modelo de ejemplo
-const UserSchema = new mongoose.Schema({
-  name: String,
-  email: String,
-});
-const User = mongoose.model("User", UserSchema);
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ Conectado a MongoDB Atlas"))
+  .catch(err => console.error("❌ Error de conexión:", err));
 
-// Endpoint para obtener usuarios
-app.get("/users", async (req, res) => {
-  const users = await User.find();
-  res.json(users);
+// 
+app.get("/grupos", async (req, res) => {
+  try {
+    const grupos = await Grupo.find(); // Obtener todos los grupos
+    res.json(grupos);
+  } catch (error) {
+    console.error('Error al obtener los grupos:', error);
+    res.status(500).json({ error: 'Error al obtener los grupos' });
+  }
 });
 
 const PORT = process.env.PORT || 3001;
